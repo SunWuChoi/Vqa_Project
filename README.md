@@ -11,24 +11,35 @@ Pytorch implementation of the following papers
 ## Directory and File Structure
 ```
 .
-+-- COCO-2015/
-|   +-- images/ (link of /dataset/COCO2015 from server (using ln -s))
++-- datasets/
+|   +-- images/
+|       +-- test2015/
+|           +-- COCO_test2015_000000000001.jpg
+|           +-- COCO_test2015_000000000014.jpg
+|           +-- ...
 |       +-- train2014/
-|       +-- ...
-|   +-- resized_images/
-|       +-- train2014/
-|       +-- ...
-|       +-- Questions/
-|       +-- Annotations/
-|       +-- train.npy
-|       +-- ...
-|       +-- vocab_questions.txt
-|       +-- vocab_answers.txt
-|   +-- <questions>.json
-|   +-- <annotations>.json
-+-- vqa
-|   +-- .git
-|   +-- README.md
+|           +-- COCO_train2014_000000000009.jpg
+|           +-- COCO_train2014_000000000025.jpg
+|           +-- ...
+|       +-- val2014/
+|           +-- COCO_val2014_000000000042.jpg
+|           +-- COCO_val2014_000000000073.jpg
+|           +-- ...
+|   +-- Questions/
+|       +-- v2_OpenEnded_mscoco_test2015_questions.json
+|       +-- v2_OpenEnded_mscoco_test-dev2015_questions.json
+|       +-- v2_OpenEnded_mscoco_train2014_questions.json
+|       +-- v2_OpenEnded_mscoco_val2014_questions.json
+|   +-- Annotations/
+|       +-- v2_mscoco_train2014_annotations.json
+|       +-- v2_mscoco_val2014_annotations.json
+|   +-- test.npy
+|   +-- test-dev.npy
+|   +-- train.npy
+|   +-- train_valid.npy
+|   +-- valid.npy
+|   +-- vocab_answers.txt
+|   +-- vocab_questions.txt
 ```
 
 
