@@ -1,12 +1,6 @@
 # visual_question_answering
 Pytorch implementation of the following papers 
 - VQA: Visual Question Answering (https://arxiv.org/pdf/1505.00468.pdf).
-- Stacked Attention Networks for Image Question Answering (https://arxiv.org/abs/1511.02274)
-- Making the V in VQA Matter: Elevating the Role of Image Understanding in Visual Question Answering (https://arxiv.org/abs/1612.00837)
-- Bottom-Up and Top-Down Attention for Image Captioning and Visual Question Answering (https://arxiv.org/abs/1707.07998)
-
-
-![model](./png/basic_model.png)
 
 ## Directory and File Structure
 ```
@@ -91,6 +85,3 @@ Use plotter notebook file to plot the results stored in the logs folder
 ## References
 * Paper implementation
   + Keywords: Visual Question Answering ;
-    
-* Baseline Model
-  + Github: https://github.com/tbmoon/basic_vqa
