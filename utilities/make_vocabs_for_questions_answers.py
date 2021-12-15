@@ -71,7 +71,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_dir', type=str, default='/run/media/hoosiki/WareHouse3/mtb/datasets/VQA',
+    parser.add_argument('--input_dir', type=str, default='datasets',
                         help='directory for input questions and answers')
     parser.add_argument('--n_answers', type=int, default=1000,
                         help='the number of answers to be kept in vocab')

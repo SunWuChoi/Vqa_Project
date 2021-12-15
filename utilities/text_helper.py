@@ -1,6 +1,5 @@
 import re
 
-
 SENTENCE_SPLIT_REGEX = re.compile(r'(\W+)')
 
 
