@@ -61,6 +61,21 @@ $ git clone https://github.com/SunWuChoi/Vqa_Project.git
 We have used VQA2 in for this project
 Download VQA Annotations, VQA Input Questions, and VQA Input Images and unzip them to the datasets folder to match the directory structure
 
+# VQA Annotations
+v2_Annotations_Train_mscoco.zip - https://s3.amazonaws.com/cvmlp/vqa/mscoco/vqa/v2_Annotations_Train_mscoco.zip
+v2_Annotations_Val_mscoco.zip - https://s3.amazonaws.com/cvmlp/vqa/mscoco/vqa/v2_Annotations_Val_mscoco.zip
+
+# VQA Input Questions
+v2_Questions_Train_mscoco.zip - "https://s3.amazonaws.com/cvmlp/vqa/mscoco/vqa/v2_Questions_Train_mscoco.zip
+v2_Questions_Val_mscoco.zip - "https://s3.amazonaws.com/cvmlp/vqa/mscoco/vqa/v2_Questions_Val_mscoco.zip
+v2_Questions_Test_mscoco.zip - "https://s3.amazonaws.com/cvmlp/vqa/mscoco/vqa/v2_Questions_Test_mscoco.zip
+
+# VQA Input Images (COCO)
+train2014.zip - http://images.cocodataset.org/zips/train2014.zip
+val2014.zip - http://images.cocodataset.org/zips/val2014.zip
+test2015.zip - http://images.cocodataset.org/zips/test2015.zip
+
+
 #### 4. Preproccess input data for (images, questions and answers).
 
 run the preprocess notebook file to preprocess the datasets
