@@ -44,49 +44,38 @@ Pytorch implementation of the following papers
 
 
 ## Usage 
-
-#### 1. Clone the repositories.
+#### 1. Prepare an environment
+This is a preparation step for local machines with CUDA Gpu
+create python 3.8.12 on conda env
 ```bash
-$ git clone https://github.com/SatyamGaba/visual_question_answering.git
+$ conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
+```
+install required ppackages as the system needs
+
+#### 2. Clone the repositories.
+```bash
+$ git clone https://github.com/SunWuChoi/Vqa_Project.git
 ```
 
-#### 2. Download and unzip the dataset from official url of VQA: https://visualqa.org/download.html.
+#### 3. Download and unzip the dataset from official url of VQA: https://visualqa.org/download.html.
 We have used VQA2 in for this project
+Download VQA Annotations, VQA Input Questions, and VQA Input Images and unzip them to the datasets folder to match the directory structure
+
+#### 4. Preproccess input data for (images, questions and answers).
+
+run the preprocess notebook file to preprocess the datasets
+
+#### 5. Train model for VQA task.
+Go to the directory where train.py is and run the train with appropriate arguments you need
 ```bash
-$ cd visual_question_answering/utils
-$ chmod +x download_and_unzip_datasets.csh
-$ ./download_and_unzip_datasets.csh
+$ python train.py
 ```
-
-#### 3. Preproccess input data for (images, questions and answers).
-
-```bash
-$ python resize_images.py --input_dir='../COCO-2015/Images' --output_dir='../COCO-2015/Resized_Images'  
-$ python make_vacabs_for_questions_answers.py --input_dir='../COCO-2015'
-$ python build_vqa_inputs.py --input_dir='../COCO-2015' --output_dir='../COCO-2015'
-```
-
-#### 4. Train model for VQA task.
-
-```bash
-$ cd ..
-$ python train.py --model_name="<name to save logs>" --resume_epoch="<epoch number to resume from>" --saved_model="<saved model if resume training>"
-```
-#### 5. Plotting.
-Rename model_name variable in `plotter.py`
-```bash
-$ python plotter.py
-```
-
-#### 6. Infer the trained model on an Image.
-
-```bash
-$ python test.py --saved_model="<path to model>" --image_path="<path to image>" --question="<ask question here>"
-```
+#### 6. Plotting.
+Use plotter notebook file to plot the results stored in the logs folder
 
 ## References
 * Paper implementation
-  + Keywords: Visual Question Answering ; Simple Attention; Stacked Attention; Top-Down Attention;
+  + Keywords: Visual Question Answering ;
     
 * Baseline Model
   + Github: https://github.com/tbmoon/basic_vqa
