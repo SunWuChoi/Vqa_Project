@@ -8,6 +8,7 @@ sample_datasets/
 datasets/
 models/
 logs/
+png/
 
 __pycache__
 tmp
