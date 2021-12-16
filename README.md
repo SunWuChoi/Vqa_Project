@@ -40,7 +40,7 @@ Pytorch implementation of the following papers
 ## Usage 
 #### 1. Prepare an environment
 This is a preparation step for local machines with CUDA Gpu
-create python 3.6 or 3.7 on conda env
+create python 3.6, 3.7, 3.8 for opencv for preprocessing and 3.9 for training on conda env
 ```bash
 $ conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 $ conda install opencv
