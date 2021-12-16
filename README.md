@@ -46,6 +46,7 @@ $ conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 $ conda install opencv
 $ conda install notebook
 $ conda install tqdm
+$ conda install matplotlib
 $ pip install fvcore
 ```
 install required packages as the system needs
