@@ -1,13 +1,19 @@
 import os
 import argparse
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import numpy as np
+
 from torch.optim import lr_scheduler
 from data_loader import get_loader
-from models import VqaModel, SANModel
+from models import VqaModel
+#from models import Vqa_MUTAN_Model
+#from models import SANModel
 
+np_load_old = np.load
+# modify the default parameters of np.load
+np.load = lambda *a,**k: np_load_old(*a, allow_pickle=True, **k)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
@@ -29,16 +35,7 @@ def main(args):
     ans_vocab_size = data_loader['train'].dataset.ans_vocab.vocab_size
     ans_unk_idx = data_loader['train'].dataset.ans_vocab.unk2idx
 
-#     model = VqaModel(
-#         embed_size=args.embed_size,
-#         qst_vocab_size=qst_vocab_size,
-#         ans_vocab_size=ans_vocab_size,
-#         word_embed_size=args.word_embed_size,
-#         num_layers=args.num_layers,
-#         hidden_size=args.hidden_size).to(device)
-
-
-    model = SANModel(
+    model = VqaModel(
         embed_size=args.embed_size,
         qst_vocab_size=qst_vocab_size,
         ans_vocab_size=ans_vocab_size,
@@ -46,56 +43,79 @@ def main(args):
         num_layers=args.num_layers,
         hidden_size=args.hidden_size).to(device)
     
+    params = list(model.img_encoder.model.fc.parameters()) \
+        + list(model.qst_encoder.parameters()) \
+        + list(model.fc1.parameters()) \
+        + list(model.fc2.parameters())
+
+    optimizer = optim.Adam(params, lr=args.learning_rate) 
+    
+#     model = Vqa_MUTAN_Model(
+#         embed_size=args.embed_size,
+#         qst_vocab_size=qst_vocab_size,
+#         ans_vocab_size=ans_vocab_size,
+#         word_embed_size=args.word_embed_size,
+#         num_layers=args.num_layers,
+#         hidden_size=args.hidden_size).to(device)
+    
+#     params = list(model.img_encoder.fc.parameters()) \
+#         + list(model.qst_encoder.parameters()) \
+#         + list(model.fc1.parameters()) \
+#         + list(model.fc2.parameters())
+
+#     optimizer = optim.Adam(params, lr=args.learning_rate)
+    
+#     model = SANModel(
+#         embed_size=args.embed_size,
+#         qst_vocab_size=qst_vocab_size,
+#         ans_vocab_size=ans_vocab_size,
+#         word_embed_size=args.word_embed_size,
+#         num_layers=args.num_layers,
+#         hidden_size=args.hidden_size).to(device)
+    
+#     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
+    
     criterion = nn.CrossEntropyLoss()
-
-    # resume training
-    if args.resume_epoch!=0:  
-        model = torch.load(args.saved_model)
-        torch.cuda.empty_cache()
-
-    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
+    
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
-
-    #callbacks = [EarlyStopping(monitor='val_loss', patience=5)]
-    #model.set_callbacks(callbacks)
-    early_stop_threshold = 3
-    best_loss = 99999
-    val_increase_count = 0
-    stop_training = False
-    prev_loss = 9999
-
-    for epoch in range(args.resume_epoch, args.num_epochs):
-
+    
+    resume_epoch = 0
+    # resume training
+    if args.saved_model != 'None':
+        checkpoint = torch.load(args.saved_model)
+        resume_epoch = checkpoint['epoch']
+        model.load_state_dict(checkpoint['state_dict'])
+        scheduler.load_state_dict(checkpoint['scheduler'])
+        torch.cuda.empty_cache()
+    
+    for epoch in range(resume_epoch, args.num_epochs):
         for phase in ['train', 'valid']:
-
             running_loss = 0.0
             running_corr_exp1 = 0
             running_corr_exp2 = 0
             batch_step_size = len(data_loader[phase].dataset) / args.batch_size
-
+            
             if phase == 'train':
-                scheduler.step()
                 model.train()
             else:
                 model.eval()
-
+            
             for batch_idx, batch_sample in enumerate(data_loader[phase]):
-<<<<<<< refs/remotes/origin/master
-<<<<<<< refs/remotes/origin/master
-#                 if batch_idx == 1:
-#                     break
+                torch.cuda.empty_cache()
                 image = batch_sample['image'].to(device)
                 question = batch_sample['question'].to(device)
                 label = batch_sample['answer_label'].to(device)
                 multi_choice = batch_sample['answer_multi_choice']  # not tensor, list.
 
                 optimizer.zero_grad()
+
                 with torch.set_grad_enabled(phase == 'train'):
 
                     output = model(image, question)      # [batch_size, ans_vocab_size=1000]
                     _, pred_exp1 = torch.max(output, 1)  # [batch_size]
                     _, pred_exp2 = torch.max(output, 1)  # [batch_size]
-                    loss = criterion(output, label)
+                    
+                    loss = criterion(output, label.long())
 
                     if phase == 'train':
                         loss.backward()
@@ -109,15 +129,16 @@ def main(args):
                 running_corr_exp1 += torch.stack([(ans == pred_exp1.cpu()) for ans in multi_choice]).any(dim=0).sum()
                 running_corr_exp2 += torch.stack([(ans == pred_exp2.cpu()) for ans in multi_choice]).any(dim=0).sum()
 
-                # Print the average loss after every batch.
-                if batch_idx % 1 == 0:
+                # Print the average loss in a mini-batch.
+                if batch_idx % 100 == 0:
                     print('| {} SET | Epoch [{:02d}/{:02d}], Step [{:04d}/{:04d}], Loss: {:.4f}'
-                          .format(phase.upper(), epoch+1, args.num_epochs, batch_idx, int(batch_step_size), loss.item()), end = '\r')
+                          .format(phase.upper(), epoch+1, args.num_epochs, batch_idx, int(batch_step_size), loss.item()))
+
+            if phase == 'train':
+                scheduler.step()
 
             # Print the average loss and accuracy in an epoch.
             epoch_loss = running_loss / batch_step_size
-#             epoch_loss = running_loss / 1  ## to be removed
-#             epoch_acc_exp1 = running_corr_exp1.double() / (args.batch_size * 1)     ## to be removed
             epoch_acc_exp1 = running_corr_exp1.double() / len(data_loader[phase].dataset)      # multiple choice
             epoch_acc_exp2 = running_corr_exp2.double() / len(data_loader[phase].dataset)      # multiple choice
 
@@ -125,40 +146,22 @@ def main(args):
                   .format(phase.upper(), epoch+1, args.num_epochs, epoch_loss, epoch_acc_exp1, epoch_acc_exp2))
 
             # Log the loss and accuracy in an epoch.
-            with open(os.path.join(args.log_dir, '{}-{}-log-epoch-{:02}.txt')
-                      .format(args.model_name, phase, epoch+1), 'w') as f:
+            with open(os.path.join(args.log_dir, '{}-log-epoch-{:02}.txt')
+                      .format(phase, epoch+1), 'w') as f:
                 f.write(str(epoch+1) + '\t'
                         + str(epoch_loss) + '\t'
                         + str(epoch_acc_exp1.item()) + '\t'
                         + str(epoch_acc_exp2.item()))
 
-            if phase == 'valid':
-                if epoch_loss < best_loss:
-                    best_loss = epoch_loss
-                    torch.save(model, os.path.join(args.model_dir, 'best_model.pt'))
-                if epoch_loss > prev_loss:
-                    val_increase_count += 1
-                else:
-                    val_increase_count = 0
-                if val_increase_count >= early_stop_threshold:
-                    stop_training = True
-                prev_loss = epoch_loss
         # Save the model check points.
         if (epoch+1) % args.save_step == 0:
-#             pass
-#             torch.save({'epoch': epoch+1, 'state_dict': model.state_dict()},
-            torch.save(model,
-                       os.path.join(args.model_dir, '{}-epoch-{:02d}.pt'.format(args.model_name, epoch+1)))
+            torch.save({'epoch': epoch+1, 'state_dict': model.state_dict(), 'scheduler_state_dict': scheduler.state_dict()},
+                       os.path.join(args.model_dir, 'model-epoch-{:02d}.ckpt'.format(epoch+1)))
 
-        if stop_training:
-            break
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    
-    parser.add_argument('--model_name', type=str,
-                        help='model name.') 
 
     parser.add_argument('--input_dir', type=str, default='./datasets',
                         help='input directory for visual question answering.')
@@ -202,7 +205,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_epochs', type=int, default=30,
                         help='number of epochs.')
 
-    parser.add_argument('--batch_size', type=int, default=256,
+    parser.add_argument('--batch_size', type=int, default=128,
                         help='batch_size.')
 
     parser.add_argument('--num_workers', type=int, default=8,
@@ -211,12 +214,9 @@ if __name__ == '__main__':
     parser.add_argument('--save_step', type=int, default=1,
                         help='save step of model.')
     
-    parser.add_argument('--resume_epoch', type=int, default = 0,
+    parser.add_argument('--saved_model', type=str, default = 'None',
                         help='load saved model from which epoch')
     
-    parser.add_argument('--saved_model', type=str, default = 'best_model.pt',
-                        help='load saved model from which epoch') 
-
     args = parser.parse_args()
-
+    print("Starting main")
     main(args)
