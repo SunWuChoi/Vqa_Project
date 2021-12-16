@@ -48,7 +48,10 @@ $ conda install notebook
 $ conda install tqdm
 $ pip install fvcore
 ```
-install required ppackages as the system needs
+install required packages as the system needs
+If you cannot find a python version that satifies all the requirements, we suggest installing opencv in python 3.6 and run the preprocessing
+Python 3.6 and its packages are able to run the code but it might run into some compatibility issues or minor errors
+After preprocessing is done using python 3.6 based environment, we recommend using python 3.9 and the packages above except opencv to run the training
 
 #### 2. Clone the repositories.
 ```bash
