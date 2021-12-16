@@ -90,6 +90,12 @@ $ python train.py
 #### 6. Plotting.
 Use plotter notebook file to plot the results stored in the logs folder
 
+#### 7. Try it yourself!
+Use the interence.ipynb in jupyter notebook with a model in the models folder
+Try to download this https://drive.google.com/file/d/1UaIcC7Z_40H8URS5dGYSDmza1w7R1oHw/view?usp=sharing
+This is a ResNeSt model of 24 epoch
+Try to download this and put it under models folder and run the notebook file to try it yourself
+
 ## References
 * Paper implementation
   + Keywords: Visual Question Answering ;
