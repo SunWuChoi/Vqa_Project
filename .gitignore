@@ -3,10 +3,9 @@
 *.swp
 .ipynb_checkpoints
 .DS_Store
+*.ckpt
 
-sample_datasets/
 datasets/
-models/
 logs/
 png/
 
